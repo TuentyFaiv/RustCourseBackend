@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Template rust (Actix + Tera)</title>
+</head>
+<body>
+  <header>
+    <h1>Hello blog</h1>
+    <a href="/create">Create new</a>
+  </header>
+  <main>
+    <section id="blogs">
+      {% for blog in blogs %}
+        <article>
+          <a href="/{{ blog.slug }}">
+            <h1>{{ blog.title }}</h1>
+            <p>{{ blog.body | truncate(length=15) }}</p>
+          </a>
+          <button type="button" data-id="{{ blog.id }}">
+            Remove
+          </button>
+          <a href="/update/{{ blog.slug }}">
+            Update
+          </a>
+        </article>
+      {% endfor %}
+    </section>
+  </main>
+  <script tpye="text/javascript">
+    const section = document.querySelector("#blogs");
+
+    async function deletePost(id) {
+      try {
+        const request = await fetch(`/blog/delete/${id}`, {
+          method: "DELETE"
+        });
+        const response = await request.json();
+      } catch (error) {}
+    }
+
+    section.addEventListener("click", async function (event) {
+      const { target: element } = event;
+      const { id } = element.dataset;
+      if (element.tagName === "BUTTON" && id) {
+        await deletePost(id);
+        const home = `${location.origin}/`;
+        location.href = home;
+      }
+    });
+  </script>
+</body>
+</html>
